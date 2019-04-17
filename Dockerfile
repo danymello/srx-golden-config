@@ -1,4 +1,4 @@
-FROM python:2.7.15-slim-jessie
+FROM python:2
 
 # Environment variables
 ENV DEBIAN_FRONTEND noninteractive
