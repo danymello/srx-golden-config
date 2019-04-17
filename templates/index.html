@@ -1,0 +1,25 @@
+{% extends "structure.html" %}
+
+{% block content %}
+
+<div id="bloc_page">
+
+	{% include 'header.html' %}
+
+	<fieldset>
+	<legend><b>Golden Config Generator Tool</b></legend>
+	<br>
+	Choose your Topology:
+	<div id=images_index>
+	 	  <a href="/l3"><img src="/static/L3.png" alt="L3"></a> 	
+	 	  <a href="/l1"><img src="/static/L1.png" alt="L1"></a> 	
+	 	  <a href="/sniffer"><img src="/static/S.png" alt="S"></a> 	
+	</div>
+	<br>
+	</fieldset>
+	<br>		
+	
+</div>
+
+{% endblock %}
+

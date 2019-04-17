@@ -1,0 +1,393 @@
+{#- IDP #}
+
+{#- zone name per deployment type#}	
+{%- if v.get('dep') == "Routed" %}
+{%- set zone_in = "Trust" %}
+{%- set zone_out = "Untrust" %}
+{%- endif %}
+{%- if v.get('dep') == "Secure" %}		
+{%- set zone_in = "Trust-L1" %}
+{%- set zone_out = "Untrust-L1" %}
+{%- endif %}	
+{%- if v.get('dep') == "Sniffer" %}	
+{%- set zone_in = "Sniffer" %}
+{%- set zone_out = "Sniffer" %}
+{%- endif %}	
+
+{%- if v.get('idp') == "idp_nss" %}	
+security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise match from-zone any;
+security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise match source-address any;
+security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise match to-zone any;
+security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise match destination-address any;
+security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise match application default;
+security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise match attacks predefined-attack-groups "Enterprise - Recommended";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}	
+	security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}	
+	security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}	
+	security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise then action drop-packet;
+	{%- endif %}
+security idp idp-policy Enterprise-Recommended-Policy rulebase-ips rule enterprise then notification log-attacks;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then permit application-services idp-policy Enterprise-Recommended-Policy;
+{%- endif %}	
+	
+
+{%- if v.get('idp') == "idp_all" %}	
+security idp idp-policy all-sig rulebase-ips rule 1 match from-zone any;
+security idp idp-policy all-sig rulebase-ips rule 1 match source-address any;
+security idp idp-policy pall-sig rulebase-ips rule 1 match to-zone any;
+security idp idp-policy all-sig rulebase-ips rule 1 match destination-address any;
+security idp idp-policy all-sig rulebase-ips rule 1 match application default;
+security idp idp-policy all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Minor;
+security idp idp-policy all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Misc_Minor;
+security idp idp-policy poc-all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Response_Minor;
+security idp idp-policy poc-all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Critical;
+security idp idp-policy poc-all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Misc_Critical;
+security idp idp-policy poc-all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Response_Critical;
+security idp idp-policy poc-all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Major;
+security idp idp-policy poc-all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Misc_Major;
+security idp idp-policy poc-all-sig rulebase-ips rule 1 match attacks predefined-attack-groups Response_Major;
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy all-sig rulebase-ips rule 1 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy all-sig rulebase-ips rule 1 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy all-sig rulebase-ips rule 1 then action drop-packet;
+	{%- endif %}
+security idp idp-policy all-sig rulebase-ips rule 1 then notification log-attacks;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outboundthen permit application-services idp-policy all-sig;
+{%- endif %}
+
+{#- Recommended IDP policy #}
+{%- if v.get('idp') == "idp_rec" %}	
+security idp idp-policy Recommended rulebase-ips rule 1 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 1 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 1 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 1 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 1 match application default;
+security idp idp-policy Recommended rulebase-ips rule 1 match attacks predefined-attack-groups "[Recommended]IP - Critical";
+security idp idp-policy Recommended rulebase-ips rule 1 match attacks predefined-attack-groups "[Recommended]IP - Minor";
+security idp idp-policy Recommended rulebase-ips rule 1 match attacks predefined-attack-groups "[Recommended]IP - Major";
+security idp idp-policy Recommended rulebase-ips rule 1 match attacks predefined-attack-groups "[Recommended]TCP - Critical";
+security idp idp-policy Recommended rulebase-ips rule 1 match attacks predefined-attack-groups "[Recommended]TCP - Minor";
+security idp idp-policy Recommended rulebase-ips rule 1 match attacks predefined-attack-groups "[Recommended]TCP - Major";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 1 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 1 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 1 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 1 then notification log-attacks;
+security idp idp-policy Recommended rulebase-ips rule 2 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 2 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 2 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 2 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 2 match application default;
+security idp idp-policy Recommended rulebase-ips rule 2 match attacks predefined-attack-groups "[Recommended]ICMP - Major";
+security idp idp-policy Recommended rulebase-ips rule 2 match attacks predefined-attack-groups "[Recommended]ICMP - Minor";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 2 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 2 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 2 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 2 then notification log-attacks;
+security idp idp-policy Recommended rulebase-ips rule 3 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 3 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 3 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 3 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 3 match application default;
+security idp idp-policy Recommended rulebase-ips rule 3 match attacks predefined-attack-groups "[Recommended]HTTP - Critical";
+security idp idp-policy Recommended rulebase-ips rule 3 match attacks predefined-attack-groups "[Recommended]HTTP - Major";
+security idp idp-policy Recommended rulebase-ips rule 3 match attacks predefined-attack-groups "[Recommended]HTTP - Minor";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 3 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 3 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 3 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 3 then notification log-attacks;
+security idp idp-policy Recommended rulebase-ips rule 4 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 4 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 4 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 4 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 4 match application default;
+security idp idp-policy Recommended rulebase-ips rule 4 match attacks predefined-attack-groups "[Recommended]SMTP - Critical";
+security idp idp-policy Recommended rulebase-ips rule 4 match attacks predefined-attack-groups "[Recommended]SMTP - Major";
+security idp idp-policy Recommended rulebase-ips rule 4 match attacks predefined-attack-groups "[Recommended]SMTP - Minor";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 4 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 4 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 4 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 4 then notification log-attacks;
+security idp idp-policy Recommended rulebase-ips rule 5 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 5 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 5 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 5 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 5 match application default;
+security idp idp-policy Recommended rulebase-ips rule 5 match attacks predefined-attack-groups "[Recommended]DNS - Critical";
+security idp idp-policy Recommended rulebase-ips rule 5 match attacks predefined-attack-groups "[Recommended]DNS - Minor";
+security idp idp-policy Recommended rulebase-ips rule 5 match attacks predefined-attack-groups "[Recommended]DNS - Major";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 5 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 5 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 5 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 5 then notification log-attacks;
+security idp idp-policy Recommended rulebase-ips rule 6 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 6 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 6 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 6 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 6 match application default;
+security idp idp-policy Recommended rulebase-ips rule 6 match attacks predefined-attack-groups "[Recommended]FTP - Critical";
+security idp idp-policy Recommended rulebase-ips rule 6 match attacks predefined-attack-groups "[Recommended]FTP - Minor";
+security idp idp-policy Recommended rulebase-ips rule 6 match attacks predefined-attack-groups "[Recommended]FTP - Major";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 6 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 6 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 6 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 6 then notification log-attacks;
+security idp idp-policy Recommended rulebase-ips rule 7 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 7 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 7 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 7 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 7 match application default;
+security idp idp-policy Recommended rulebase-ips rule 7 match attacks predefined-attack-groups "[Recommended]POP3 - Critical";
+security idp idp-policy Recommended rulebase-ips rule 7 match attacks predefined-attack-groups "[Recommended]POP3 - Minor";
+security idp idp-policy Recommended rulebase-ips rule 7 match attacks predefined-attack-groups "[Recommended]POP3 - Major";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 7 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 7 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 7 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 7 then notification log-attacks;
+security idp idp-policy Recommended rulebase-ips rule 8 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 8 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 8 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 8 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 8 match application default;
+security idp idp-policy Recommended rulebase-ips rule 8 match attacks predefined-attack-groups "[Recommended]IMAP - Critical";
+security idp idp-policy Recommended rulebase-ips rule 8 match attacks predefined-attack-groups "[Recommended]IMAP - Major";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 8 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 8 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 8 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 8 then notification log-attacks;
+security idp idp-policy Recommended rulebase-ips rule 9 match from-zone any;
+security idp idp-policy Recommended rulebase-ips rule 9 match source-address any;
+security idp idp-policy Recommended rulebase-ips rule 9 match to-zone any;
+security idp idp-policy Recommended rulebase-ips rule 9 match destination-address any;
+security idp idp-policy Recommended rulebase-ips rule 9 match application default;
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]TROJAN - Critical";
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]TROJAN - Major";
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]TROJAN - Minor";
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]VIRUS - Critical";
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]VIRUS - Major";
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]VIRUS - Minor";
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]WORM - Critical";
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]WORM - Major";
+security idp idp-policy Recommended rulebase-ips rule 9 match attacks predefined-attack-groups "[Recommended]WORM - Minor";
+	{#- action #} 
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy Recommended rulebase-ips rule 9 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy Recommended rulebase-ips rule 9 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy Recommended rulebase-ips rule 9 then action drop-packet;
+	{%- endif %}
+security idp idp-policy Recommended rulebase-ips rule 9 then notification log-attacks;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outboundthen permit application-services idp-policy Recommended;
+{%- endif %}
+
+
+{#- Recommended IDP policy #}
+{%- if v.get('idp') == "idp_def" %}	
+security idp idp-policy IDP_Default rulebase-ips rule 1 match from-zone any;
+security idp idp-policy IDP_Default rulebase-ips rule 1 match source-address any;
+security idp idp-policy IDP_Default rulebase-ips rule 1 match to-zone any;
+security idp idp-policy IDP_Default rulebase-ips rule 1 match destination-address any;
+security idp idp-policy IDP_Default rulebase-ips rule 1 match application default;
+security idp idp-policy IDP_Default rulebase-ips rule 1 match attacks predefined-attack-groups "IP - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 1 match attacks predefined-attack-groups "IP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 1 match attacks predefined-attack-groups "TCP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 1 match attacks predefined-attack-groups "TCP - Major";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy IDP_Default rulebase-ips rule 1 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy IDP_Default rulebase-ips rule 1 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy IDP_Default rulebase-ips rule 1 then action drop-packet;
+	{%- endif %}
+security idp idp-policy IDP_Default rulebase-ips rule 1 then notification log-attacks alert;
+security idp idp-policy IDP_Default rulebase-ips rule 2 match from-zone any;
+security idp idp-policy IDP_Default rulebase-ips rule 2 match source-address any;
+security idp idp-policy IDP_Default rulebase-ips rule 2 match to-zone any;
+security idp idp-policy IDP_Default rulebase-ips rule 2 match destination-address any;
+security idp idp-policy IDP_Default rulebase-ips rule 2 match application default;
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DB - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DB - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DDOS - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DDOS - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DHCP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DHCP - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DNS - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DNS - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DOS - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "DOS - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "FTP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "FTP - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "HTTP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "HTTP - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "ICMP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "ICMP - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "IMAP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "IMAP - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "NETBIOS - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "NETBIOS - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "MS-RPC - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "MS-RPC - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "NFS - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "NFS - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "POP3 - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "POP3 - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "PORTMAPPER - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "PORTMAPPER - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "RPC - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "RPC - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SCAN - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SCAN - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SHELLCODE - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SHELLCODE - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SMB - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SMB - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SMTP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SMTP - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SSH - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "SSH - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "TELNET - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "TELNET - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "TROJAN - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "TROJAN - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "WORM - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "WORM - Major";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "APP - Critical";
+security idp idp-policy IDP_Default rulebase-ips rule 2 match attacks predefined-attack-groups "APP - Major";
+	{#- action #}
+	{%- if v.get('idp_action') == "idp_action_rec" %}
+	security idp idp-policy IDP_Default rulebase-ips rule 2 then action recommended;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_log" or v.get('dep') == "Sniffer" %}
+	security idp idp-policy IDP_Default rulebase-ips rule 2 then action no-action;
+	{%- endif %}
+	{%- if v.get('idp_action') == "idp_action_drop" %}
+	security idp idp-policy IDP_Default rulebase-ips rule 2 then action drop-packet;
+	{%- endif %}
+security idp idp-policy IDP_Default rulebase-ips rule 2 then notification log-attacks alert;
+security idp idp-policy IDP_Default rulebase-ips rule 3 match from-zone any;
+security idp idp-policy IDP_Default rulebase-ips rule 3 match source-address any;
+security idp idp-policy IDP_Default rulebase-ips rule 3 match to-zone any;
+security idp idp-policy IDP_Default rulebase-ips rule 3 match destination-address any;
+security idp idp-policy IDP_Default rulebase-ips rule 3 match application default;
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "DB - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "DDOS - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "DHCP - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "DNS - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "DOS - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "FTP - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "HTTP - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "ICMP - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "IMAP - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "NETBIOS - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "MS-RPC - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "NFS - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "POP3 - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "PORTMAPPER - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "RPC - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "SCAN - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "SHELLCODE - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "SMB - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "SMTP - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "SSH - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "TELNET - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "TROJAN - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "WORM - Minor";
+security idp idp-policy IDP_Default rulebase-ips rule 3 match attacks predefined-attack-groups "APP - Minor";
+{#- choose to let no-action here and avoid force drop for those minors #}
+security idp idp-policy IDP_Default rulebase-ips rule 3 then action no-action;
+security idp idp-policy IDP_Default rulebase-ips rule 3 then notification log-attacks;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outboundthen permit application-services idp-policy IDP_Default;
+{%- endif %}
+
+
+{#- Sensor configuration #}
+{%- if v.get('idp') != "idp_off" %}
+security idp sensor-configuration flow drop-on-failover;
+security idp sensor-configuration flow drop-if-no-policy-loaded;
+security idp security-package automatic enable interval 24;
+security idp sensor-configuration re-assembler no-ignore-reassembly-memory-overflow;
+	{#- IDP mode #}
+	{%- if v.get('idp_mode') == "idp_mode_perimeter" %}
+	security idp sensor-configuration security-configuration protection-mode perimeter;
+	{%- endif %}
+	{%- if v.get('idp_mode') == "idp_mode_datacenter" %}
+	security idp sensor-configuration security-configuration protection-mode datacenter;
+	{%- endif %}
+	{#- IDP bypass mode #}
+	{%- if v.get('bypass_idp') == "idp_bypass_on" %}
+	security idp sensor-configuration flow idp-bypass-cpu-usg-overload;
+	{%- else %}
+	security idp sensor-configuration flow drop-on-limit;
+	{%- endif %}
+{%- endif %}

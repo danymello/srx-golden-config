@@ -1,0 +1,204 @@
+{% extends "structure.html" %}
+
+{% block content %}
+
+<div id="bloc_page">
+    	
+	{% include 'header.html' %}
+
+<p class="info">
+* Mandatory field
+</p>
+  <section id=formulaire>
+	  <form action="/sniffer" role="form" method="post" >
+	  <input type="hidden" name="deployment" id="deployment" value={{data}}>
+	  <fieldset>
+	    <legend><b>Network information</b></legend>
+	    <div>
+		<label>Sniffer interface *</label>
+		<input class="form1-input" type = "text" name="SnifferInterface" id = "SnifferInterface" value = "" placeholder="e.g.   ge-0/0/0.0" required/>
+	    </div>
+	    <div>
+		<label>MGMT interface</label>
+		<input class="form1-input" type = "text" name="MgmtInterface" id = "MgmtInterface" value = "" placeholder="e.g.   fxp0.0"/>
+		<span class="help-tip"><p>Use fxp for HE or a regular interface</p></span>
+	    </div>
+	    <div>
+		<label>MGMT IP address</label>
+		<input class="form1-input" type = "text" name="MgmtIP" id="MgmtIP" value = "" placeholder="e.g.   192.168.1.1/24"/>
+	    </div>
+     	    <div>
+		<label>MGMT Default GW</label>
+		<input class="form1-input" type = "text" name="MgmtGW" id="MgmtGW" value = "" placeholder="e.g.   192.168.1.254/24"/>
+	    </div>
+	    <div>
+		<label>Onbox logging & reporting</label>
+		<select class="form1-input" name="log_local" id="log_local">
+		  <option value = "LOG_LOCAL_ON">Enabled</option>
+		  <option value = "LOG_LOCAL_OFF">Disabled</option>
+		</select>
+		<span class="help-tip">
+		  <p>local logging and reporting.</p>
+	    </span>
+	    </div>
+	  </fieldset>
+ </section>
+ <section id=formulaire>
+  	<fieldset>
+	    <legend><b>UTM Configuration</b></legend>
+	    <div>
+		<label>Web Filtering</label>
+		<select class="form1-input" name="ewf" id="ewf">
+		  <option value = "EWF_OFF">Disabled</option>
+		  <option value = "EWF_LO">Enabled - Log Only</option>
+		</select>
+	    </div> 
+	    <div>
+		<label>Anti-Virus</label>
+		<select class="form1-input" name="avv" id="avv">
+		  <option value = "AVV_OFF">Disabled</option>
+		  <option value = "AVV_SOPHOS">Sophos AV</option>
+		</select>
+	    </div>
+	    <div>
+		<label>Anti-Spam</label>
+		<select class="form1-input" name="as" id="as">
+		  <option value = "AS_OFF">Disabled</option>
+		  <option value = "AS_ON">Enabled</option>
+		</select>
+	    </div>
+	</fieldset>
+  </section> 
+  <section id=formulaire>
+	  <fieldset>
+	    <legend><b>AppSecure Configuration</b></legend>
+	    <div>
+		<label>AppTrack</label>
+		<select class="form1-input" name="apptrack" id="apptrack">
+		  <option value="apptrack_off">Disabled</otpion>
+		  <option value="apptrack_on">Enabled</otpion>
+		</select>
+	    </div>
+		<p id=formulaire_disable>
+	    	We cannot apply AppFW policy in Sniffer mode
+	    	</p>
+	  </fieldset>
+  </section>
+  <section id=formulaire>
+	  <fieldset>
+	    <legend><b>IDP Configuration</b></legend>
+	    <div>
+		<label>IDP Policy</label>
+		<select class="form1-input" name="idp" id="idp">
+		  <option value="idp_off">Disabled</option>
+		  <option id=test value="idp_rec">IDP - Recommended</option>
+		  <option value="idp_def">IDP - Default</option>
+		  <option value="idp_all">IDP - All</option>
+		  <option value="idp_nss">IDP - Enterprise Recommended</option>
+		</select>
+		<span class="help-tip">
+		  <p><b>"Recommended"</b> correspond to the recommended template (light policy)<br><b>"Default"</b> correspond to the default template.<br><b>"All"</b> corresponf to all Critical/Major/Minor signatures.<br><b>"Enterprise Enterprise"</b> correspond to recommended IDP policy for high security.</p>
+	        </span>
+	    </div>
+	    <p id=formulaire_disable>
+	    Whatever is the action, attacks will just be logged in Sniffer mode.
+	    </p>
+	    <div>
+		<label>IDP Mode</label>
+		<select class="form1-input" name="idp_mode" id="idp_mode">
+		  <option value="idp_mode_perimeter">Protecting Users</otpion>
+		  <option value="idp_mode_datacenter">Protecting Servers</option>
+		  <option value="idp_mode_both">Both</option>
+		</select>
+		<span class="help-tip">
+		  <p>Tune the engine to look at Client 2 Server attack or Sercer 2 clients or both direction.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>Bypass Mode</label>
+		<select class="form1-input" name="bypass_idp" id="bypass_idp">
+		  <option value="idp_bypass_off">Off</otpion>
+		  <option value="idp_bypass_on">On</option>
+		</select>
+		<span class="help-tip">
+		  <p>IDP insecption is bypassed when CPU is more than 90%</p>
+	        </span>
+	    </div>
+	  </feldset>
+  </section>
+  <section id=formulaire>
+	  <fieldset>
+	    <legend><b>Sky ATP Configuration</b></legend>
+	    <p id=formulaire_disable>
+	    	Sky ATP will work in log only mode in Sniffer mode.
+	    </p><br>
+	    <div>
+		<label class="form1">Advanced-Anti-MalWare</label>
+		<select class="form1-input" name="aamw" id="aamw">
+			<option value="aamw_off">Disabled</otpion>
+		  	<option value="aamw_on">Enabled</otpion>
+		</select>
+		<<span class="help-tip">
+		  <p>Premium access needs to be granted for the SRX S/N to get access to full Sky ATP features-set.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>SecIntel - Command & Control Feed</label>
+		<select class="form1-input" name="secintel_cc_ip" id="secintel_cc_ip">
+		  <option value="cc_ip_off">Disabled</otpion>
+		  <option value="cc_ip_on_log">Enabled</option>
+		</select>
+		<span class="help-tip">
+		  <p>Supported oon all platforms. It will active all CC feeds (juniper and 3rd party). 3rd party feed need to be enabled from Sky ATP Cloud UI.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>SecIntel - Infected Hosts Feed</label>
+		<select class="form1-input" name="secintel_infhosts" id="secintel_infhosts">
+		  <option value="infhosts_off">Disabled</otpion>
+		  <option value="infhosts_on_log">Enabled - Log</option>
+		</select>
+		<span class="help-tip">
+		  <p>Feed which block automatically an infected endpoint. Threshold need to be configured from Sky ATP Cloud UI.</p>
+	        </span>
+	    </div>
+	  </fieldset>
+  </section>
+  <section id=formulaire_disable>
+	  <fieldset>
+	    <legend><b>SSL Configuration</b></legend>
+	    <br><br>
+	    SSL FP feature cannot be applied in Sniffer mode.
+	    <br><br>
+	  </feldset>
+  </section>
+  <section id=formulaire>
+	  <fieldset>
+	    <legend><b>User Visibility</b></legend>
+	    <div>
+		<label>DC IP Address</label>
+		<input class="form1-input" type = "text" name="DCIP" id="DCIP" value = "" placeholder="e.g.   192.168.0.1" />
+		<span>Reachable through mgmt interface</span>
+	    </div>
+    	    <div>
+		<label>Domain Name</label>
+		<input class="form1-input" type = "text" name="DomainName" id="DomainName" value = "" placeholder="e.g.   company.local" />
+	    </div>
+    	    <div>
+		<label>User Name</label>
+		<input class="form1-input" type = "text" name="Username" id="Username" value = "" placeholder="e.g.   administrator" />
+	    </div>
+    	    <div>
+		<label>Password</label>
+		<input class="form1-input" type = "text" name="Password" id="Password" value = "" placeholder="e.g.   passsword" />
+	    </div>
+	  </feldset>
+  </section>
+  <p>
+  <center><button type="submit" value="submit">Generate my configuration</button></center>
+  </p>
+  </form>
+</div>
+
+{% endblock %}
+

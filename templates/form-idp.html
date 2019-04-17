@@ -1,0 +1,50 @@
+  <section id=formulaire>
+	  <fieldset>
+	    <legend><b>IDP Configuration</b></legend>
+	    <div>
+		<label>IDP Policy</label>
+		<select class="form1-input" name="idp" id="idp">
+		  <option value="idp_off">Disabled</option>
+		  <option id=test value="idp_rec">IDP - Recommended</option>
+		  <option value="idp_def">IDP - Default</option>
+		  <option value="idp_all">IDP - All</option>
+		  <option value="idp_nss">IDP - Enterprise Recommended</option>
+		</select>
+		<span class="help-tip">
+		  <p><b>"Recommended"</b> correspond to the recommended template (light policy)<br><b>"Default"</b> correspond to the default template.<br><b>"All"</b> corresponf to all Critical/Major/Minor signatures.<br><b>"Enterprise Enterprise"</b> correspond to recommended IDP policy for high security.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label class="form2l">IDP Action</label>
+		<select class="form2-select2" name="idp_action" id="idp_action">
+		  <option value="idp_action_rec">Recommended</option>
+		  <option value="idp_action_log">Log Only</option>
+		  <option value="idp_action_drop">Force Drop</option>
+		</select>
+		<span class="help-tip">
+		  <p><b>Recommended</b> corressponds to the recommnded action in the signature define by Juniper Signature Team</p>
+	    </span>
+	    </div>
+	    <div>
+		<label>IDP Mode</label>
+		<select class="form1-input" name="idp_mode" id="idp_mode">
+		  <option value="idp_mode_perimeter">Protecting Users</otpion>
+		  <option value="idp_mode_datacenter">Protecting Servers</option>
+		  <option value="idp_mode_both">Both</option>
+		</select>
+		<span class="help-tip">
+		  <p>Tune the engine to look at Client 2 Server attack or Sercer 2 clients or both direction.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>Bypass Mode</label>
+		<select class="form1-input" name="bypass_idp" id="bypass_idp">
+		  <option value="idp_bypass_off">Off</otpion>
+		  <option value="idp_bypass_on">On</option>
+		</select>
+		<span class="help-tip">
+		  <p>IDP insecption is bypassed when CPU is more than 90%</p>
+	        </span>
+	    </div>
+	  </fieldset>
+  </section>

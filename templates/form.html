@@ -1,0 +1,143 @@
+{% extends "structure.html" %}
+
+{% block content %}
+
+<div id="bloc_page">
+    	
+	{% include 'header.html' %}
+
+
+  <section id=formulaire>
+	  <form action="/l3" role="form" method="post" >
+	  <input type="hidden" name="deployment" id="deployment" value={{data}}>
+	  <fieldset>
+	    <legend>Network information</legend>
+	    <div>
+		<label>Trust interface *</label>
+		<input type = "text" name="TrustInterface" id = "TrustInterface" value = "" placeholder="e.g.   ge-0/0/0.0" required/>
+		<span>test</span>
+	    </div>
+	    <div>
+		<label>Untrust interface *</label>
+		<input type = "text" name="UntrustInterface" id = "UntrustInterface" value = "" placeholder="e.g.   ge-0/0/1.0" required/>
+	    </div>
+	    <div>	
+		<label>Trust IP address *</label>
+		<input type = "text" name="TrustIP" id="TrustIP" value = "" placeholder="e.g.   192.168.1.1/24" required/>
+	    </div>
+	    <div>
+		<label>Untrust IP address *</label>
+		<input type = "text" name="UntrustIP" id="UntrustIP" value = "" placeholder="e.g.   1.1.1.1/30" required/>
+	    </div>
+	    <div>
+		<label>Local logging</label>
+		<select name="log_local" id="log_local">
+		  <option value = "LOG_LOCAL_ON">Enabled</option>
+		  <option value = "LOG_LOCAL_OFF">Disabled</option>
+		</select>
+	    </div>
+	     <div>
+		<label>SYSLOG Server IP</label>
+		<input type = "text" name="SyslogIP" id = "SyslogIP" value = ""/>
+	    </div>
+	  </fieldset>
+ </section>
+ <section id=formulaire>
+  	<fieldset>
+	    <legend>UTM Configuration</legend>
+	    <div>
+		<label>Ehanced Web Filtering</label>
+		<select name="ewf" id="ewf">
+		  <option value = "EWF_OFF">Disabled</option>
+		  <option value = "EWF_LO">Enabled - Log Only</option>
+		  <option value = "EWF_DEFAULT">Enabled - Default profile</option>
+		</select>
+	    </div>
+	    <div>
+		<label>Anti-Virus</label>
+		<select name="avv" id="avv">
+		  <option value = "AVV_OFF">Disabled</option>
+		  <option value = "AVV_KASP">Kaspersky Full</option>
+		  <option value = "AVV_EXP">Express AV</option>
+		  <option value = "AVV_SOPHOS">Sophos AV</option>
+		</select>
+	    </div>
+	    <div>
+		<label>Anti-Spam</label>
+		<select name="as" id="as">
+		  <option value = "AS_OFF">Disabled</option>
+		  <option value = "AS_ON">Enabled</option>
+		</select>
+	    </div>
+	</fieldset>
+  </section> 
+  <section id=formulaire>
+	  <fieldset>
+	    <legend>AppSecure Configuration</legend>
+	    <div>
+		<label>AppTrack</label>
+		<select name="apptrack" id="apptrack">
+		  <option value="apptrack_off">Disabled</otpion>
+		  <option value="apptrack_on">Enabled</otpion>
+		</select>
+	    </div>
+	    <div>
+		<label>AppFW</table>
+		<select name="appfw" id="appfw">
+		  <option value="appfw_off">Disabled</otpion>
+		  <option value="appfw_demo">AppFW Demo</option>
+		</select>
+	    </div>
+	  </fieldset>
+  </section>
+  <section id=formulaire>
+	  <fieldset>
+	    <legend>IDP Configuration</legend>
+	    <div>
+		<label>IDP Policy</label>
+		<select name="idp" id="idp">
+		  <option value="idp_off">Disabled</option>
+		  <option value="idp_rec">IDP - Recommanded</option>
+		  <option value="idp_def">IDP - Default</option>
+		  <option value="idp_all">IDP - All</option>
+		  <option value="idp_nss">IDP - NSS</option>
+		</select>
+	    </div>
+	    <div id=subform>
+		<label>IDP Action</label>
+		<select name="idp_action" id="idp_action">
+		  <option value="idp_action_rec">Recommanded</option>
+		  <option value="idp_action_log">Log Only</option>
+		  <option value="idp_action_drop">Force Drop</option>
+
+		</select>
+	    </div>
+	  </feldset>
+  </section>
+  <section id=formulaire>
+	  <fieldset>
+	    <legend>SSL Configuration</legend>
+	    <div>
+		<label>SSL Forward Proxy</label>
+		<select name="sslfp" id="sslfp">
+		  <option value="sslfp_off">Disabled</option>
+		  <option value="sslfp_on">Enabled</option>
+		</select>
+	    </div>
+	    <div>
+		<label>SSL Proxy</label>
+		<select name="sslp" id="sslp">
+		  <option value="sslp_off">Disabled</option>
+		  <option value="sslp_on">Enabled</option>
+		</select>
+	    </div>
+	  </feldset>
+  </section>
+  <p>
+  <button type="submit" value="submit">Submit</button>
+  </p>
+  </form>
+</div>
+
+{% endblock %}
+

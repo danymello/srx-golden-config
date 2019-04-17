@@ -1,0 +1,78 @@
+{% extends "structure.html" %}
+
+{% block content %}
+
+<div id="bloc_page">
+    	
+	{% include 'header.html' %}
+
+<p class="info">
+* Mandatory field
+</p>
+  <section id=formulaire>
+	  <form action="/l3" role="form" method="post" >
+	  <input type="hidden" name="deployment" id="deployment" value={{data}}>
+	  <fieldset>
+	    <legend><b>Network information</b></legend>
+	    <div>
+		<label>Trust interface *</label>
+		<input class="form1-input" type = "text" name="TrustInterface" id = "TrustInterface" value = "" placeholder="e.g.   ge-0/0/0.0" required/>
+	    </div>
+	    <div>
+		<label>Untrust interface *</label>
+		<input class="form1-input" type = "text" name="UntrustInterface" id = "UntrustInterface" value = "" placeholder="e.g.   ge-0/0/1.0" required/>
+	    </div>
+	    <div>	
+		<label>Trust IP address *</label>
+		<input class="form1-input" type = "text" name="TrustIP" id="TrustIP" value = "" placeholder="e.g.   192.168.1.1/24" required/>
+	    </div>
+	    <div>
+		<label>Untrust IP address *</label>
+		<input class="form1-input" type = "text" name="UntrustIP" id="UntrustIP" value = "" placeholder="e.g.   1.1.1.1/30" required/>
+	    </div>
+	    <br><br>
+	    <div>
+		<label>MGMT interface</label>
+		<input class="form1-input" type = "text" name="MgmtInterface" id = "MgmtInterface" value = "" placeholder="e.g.   fxp0.0"/>
+		<span class="help-tip">
+		  <p>Use fxp for HE or a regular interface</p>
+	    </span>
+	    </div>
+	    <div>
+		<label>MGMT IP address</label>
+		<input class="form1-input" type = "text" name="MgmtIP" id="MgmtIP" value = "" placeholder="e.g.   192.168.1.1/24"/>
+	    </div>
+	    <div>
+		<label>MGMT Default GW</label>
+		<input class="form1-input" type = "text" name="MgmtGW" id="MgmtGW" value = "" placeholder="e.g.   192.168.1.254/24"/>
+	    </div>
+	    <div>
+		<label>Onbox logging & reporting</label>
+		<select class="form1-input" name="log_local" id="log_local">
+		  <option value = "LOG_LOCAL_ON">Enabled</option>
+		  <option value = "LOG_LOCAL_OFF">Disabled</option>
+		</select>
+		<span class="help-tip">
+		  <p>local logging and reporting.</p>
+	    </span>
+	    </div>
+	  </fieldset>
+ </section>
+
+
+  {% include 'form-utm.html' %}
+  {% include 'form-appsecure.html' %}
+  {% include 'form-idp.html' %}
+  {% include 'form-sky.html' %}
+  {% include 'form-secintel.html' %}
+  {% include 'form-ssl.html' %}
+  {% include 'form-userfw.html' %}
+
+  <p>
+  <center><button type="submit" value="submit">Generate my configuration</button></center>
+  </p>
+  </form>
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,114 @@
+
+{#- Genaric configuration -#}
+
+system host-name "my-awesome-srx";
+system root-authentication encrypted-password "$1$ZUlES4dp$OUwWo1g7cLoV/aMWpHUnC";
+system name-server 8.8.8.8;
+system name-server 8.8.4.4;
+system services ssh;
+system services netconf ssh;
+system syslog file security interactive-commands any;
+system syslog file security archive world-readable;
+system syslog file default-log-messages any info;
+system syslog file default-log-messages match "(requested 'commit' operation)|(copying configuration to juniper.save)|(commit complete)|ifAdminStatus|(FRU power)|(FRU removal)|(FRU insertion)|(link UP)|transitioned|Transferred|transfer-file|(license add)|(license delete)|(package -X update)|(package -X delete)|(FRU Online)|(FRU Offline)|(plugged in)|(unplugged)|GRES";
+system syslog file default-log-messages structured-data;
+
+{#- Local log #}	
+
+{%- if v.get('log_local') == "LOG_LOCAL_ON" %}
+security log mode stream;
+security log report;
+{%- endif %}
+
+{#- routed deployment #}	
+
+{%- if v.get('dep') == "Routed" %}
+interfaces {{ v.get('trust_int') }} family inet address {{ v.get('trust_ip') }};
+interfaces {{ v.get('untrust_int') }} family inet address {{ v.get('untrust_ip') }};
+
+{#- set zone variables for L3 mode #}	
+{%- set zone_in = "Trust" %}
+{%- set zone_out = "Untrust" %}
+{%- endif %}
+
+{#- Secure Wire deployment #}
+
+{%- if v.get('dep') == "Secure" %}		
+bridge-domains sw-bd1 domain-type bridge vlan-id 1;
+interfaces {{ v.get('trust_int') }} family bridge interface-mode access vlan-id 1;
+interfaces {{ v.get('untrust_int') }} family bridge interface-mode access vlan-id 1;
+security forwarding-options secure-wire access-sw interface {{ v.get('trust_int') }};
+security forwarding-options secure-wire access-sw interface {{ v.get('untrust_int') }};
+
+{#- set zone variables for L1 mode #}	
+{%- set zone_in = "Trust-L1" %}
+{%- set zone_out = "Untrust-L1" %}
+{%- endif %}
+
+{#- Set security zones #}	
+{%- if v.get('dep') == "Routed" or v.get('dep') == "Secure" %}	
+security zones security-zone {{ zone_in }} host-inbound-traffic system-services all;
+security zones security-zone {{ zone_in }} interfaces {{ v.get('trust_int') }};
+security zones security-zone {{ zone_out }} host-inbound-traffic system-services ping;
+security zones security-zone {{ zone_out }} interfaces {{ v.get('untrust_int') }};
+{%- endif %}
+
+{#- Sniffer deployment #}	
+{%- if v.get('dep') == "Sniffer" %}	
+
+{#- set zone variables for Sniffer mode #}
+{%- set zone_in = "Sniffer" %}
+{%- set zone_out = "Sniffer" %}
+
+{#- promiscuous mode is on physical interface #}
+interfaces {{ v.get('sniffer_int_phy') }} promiscuous-mode;
+interfaces {{ v.get('sniffer_int') }} family inet address 192.168.255.1/24 arp 192.168.255.254 mac 00:00:01:01:01:01;
+security zones security-zone Sniffer host-inbound-traffic system-services all;
+security zones security-zone Sniffer interfaces {{ v.get('sniffer_int') }};
+
+{#- Sniffer is isolated in a custom #}
+routing-instances Sniffer instance-type virtual-router;
+routing-instances Sniffer interface {{ v.get('sniffer_int') }};
+routing-instances Sniffer routing-options static route 0.0.0.0/0 next-hop 192.168.255.254;
+{%- endif %}	
+
+
+{#- Management interface #}	
+{%- if v.get('mgmt_int') != "fxp0.0" and v.get('mgmt_int') != "" %}	
+
+{#- create MGMT zone #}
+security zones functional-zone management host-inbound-traffic system-services all;
+security zones functional-zone management interfaces {{ v.get('mgmt_int') }};
+{%- endif %}
+
+{#- set IP MGMT (if exist) #}
+{%- if v.get('mgmt_int') != "" %}	
+interfaces {{ v.get('mgmt_int') }} family inet address {{ v.get('mgmt_ip') }};
+{%- endif %}
+
+{#- set mgmt gateway (if exist) #}
+{%- if v.get('mgmt_gw') != "" %}	
+routing-options static route 0/0 next-hop {{ v.get('mgmt_gw') }};
+{%- endif %}
+
+{#- create base security policy rule #}	
+{#- when AppSecure is used - Firewall policy will be turned to NGFW mode (Unified Policy) #}
+{%- if v.get('appfw') == "appfw_demo" %}
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match source-address any;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match destination-address any;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match application junos-defaults;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match dynamic-application junos:ICMP;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match dynamic-application junos:DNS;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match dynamic-application junos:SSL;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match dynamic-application junos:HTTP;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then log session-init;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then log session-close;
+security policies dependent-dynamic-application-lookup;
+{%- else %}
+{#- Default layer 4 policy #}
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match source-address any;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match destination-address any;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound match application any;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then log session-init;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then log session-close;
+{%- endif %}

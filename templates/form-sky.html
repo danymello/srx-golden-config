@@ -1,0 +1,29 @@
+ <section id=formulaire>
+	  <fieldset>
+	    <legend><b>Sky ATP Configuration</b></legend>
+	    <div>
+		<label class="form1">Advanced-Anti-MalWare</label>
+		<select class="form1-input" name="aamw" id="aamw">
+		  <option value="aamw_off">Disabled</otpion>
+		  <option value="aamw_on">Enabled</otpion>
+		</select>
+		<span class="help-tip">
+		  <p>Premium access needs to be granted for the SRX S/N to get access to full Sky ATP features-set.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label class="form2l">log only</label>
+		<input class="form2cb" type=checkbox name="aamw_log_only" id="aamw_log_only" />
+		<span class="help-tip">
+		  <p>No traffic will be dropped</p>
+	        </span>
+	    </div>
+	    <div>
+		<label class="form2l">Or configure Blocking threshold</label>
+		<input class="form2-select2" type = "text" name="aamw_threshold" id = "aamw_threshold" value = "" placeholder="e.g.   7"/>
+		<span class="help-tip">
+		  <p>Range is from 1 to 10. Recommended is 7.</p>
+	        </span>
+	    </div>
+	  </fieldset>
+  </section>

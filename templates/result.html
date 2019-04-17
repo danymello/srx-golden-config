@@ -1,0 +1,91 @@
+{% extends "structure.html" %}
+
+{% block content %}
+
+<div id="bloc_page">
+    	
+	{% include 'header.html' %}
+
+<br>
+<h2>How to load the configuration</h2>
+<br>
+<br>
+<section id=instruction>
+<code>
+>configuration<br>
+{% if merge == "true" %}
+<strong>#load merge terminal</strong><br>
+{% else %}
+<strong>#load override terminal</strong><br>
+{% endif %}
+<p>
+<-- Paste the configuration then CRTL-D -->
+</p>
+#commit-and-quit<br>
+</code>
+<br>
+<span>Default password is <strong>Jun1per</strong></span>
+<br><br>
+
+{% if ssl == "sslfp_on" %}
+	<p>
+	------------<br><br>
+	<b>SSL Forword Proxy is turned on. Make sure to:</b>
+	<ol>
+		<li>Install default Trusted CA on SRX<br></li>
+		<p>
+		<code>
+		>request security pki ca-certificate ca-profile-group load ca-group-name All-Trusted-CA-Def filename default
+		</code>
+		</p>
+		<li>Load a local SRX certificate. You can use this <a href="/static/ssl-ca.key">public key</a> and <a href="/static/ssl-ca.crt">associated certifcate</a> (autosigned)</li>
+		<p>
+		<code>
+		> request security pki local-certificate load key ssl-ca.key filename ssl-ca.crt certificate-id ssl-ac-poc
+		</code>
+		</p>
+		<li>Install the certificate on endpoint to avoid any browser warning!</li>
+	</ol>
+	</p>
+{% endif %}
+	<p>
+	------------<br><br>
+	<b>If IDP is turned on. Make sure to have a IDP license and latest sigpak installed.</b>
+	<ol>
+		<li>Donwload latest sigpak<br></li>
+		<p>
+		<code>
+		> request security idp security-package download
+		</code>
+		</p>
+		<li>Once downloaded, Install the sigpak</li>
+		<p>
+		<code>
+		> request security idp security-package instal
+		</code>
+		</p>
+		<li>If the SRX does not have Internet access, follow IDP offline< update procedure./li>
+	</ol>
+	</p>
+</section>
+<br>
+
+<br>
+<a href=/download/{{file_name}}.txt><center><button style="font-size:20px; height:100px; width:600px">Download the configuration file</button></center></a>
+<br>
+<br>
+<h3>Configuration output:</h3>
+<br>
+<section id=configuration>
+<div>
+<code>
+{% for e in d %}
+{{ e }}<br>
+{% endfor %}
+</code>
+</div>
+</section>
+</div>
+
+{% endblock %}
+

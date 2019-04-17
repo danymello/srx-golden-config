@@ -1,0 +1,100 @@
+  <section id=formulaire>
+	  <fieldset>
+	  	<legend><b>Security Intelligence</b></legend>
+	  	<div>
+		<label>Juniper Command & Control Feed (IP)</label>
+		<select class="form1-input" name="secintel_cc_ip" id="secintel_cc_ip">
+		  <option value="cc_ip_off">Disabled</otpion>
+		  <option value="cc_ip_on_default">Enabled Default</option>
+		  <option value="cc_ip_on_log">Enabled Log Only</option>
+		</select>
+		<span class="help-tip">
+		  <p>CC feed provided by Juniper Networks. High Quality feed. Default threshold is 7.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>Juniper Command & Control Feed (URL)</label>
+		<select class="form1-input" name="secintel_cc_url" id="secintel_cc_url">
+		  <option value="cc_url_off">Disabled</otpion>
+		  <option value="cc_url_on_default">Enabled Default</option>
+		  <option value="cc_url_on_log">Enabled Log Only</option>
+		</select>
+		<span class="help-tip">
+		  <p>CC feed provided by Juniper Networks. High Quality feed. Default threshold is 7.</p>
+	        </span>
+	    </div>
+	    <div>
+	    <label>3rd Party - Blocklist (IP)</label>
+		<select class="form1-input" name="secintel_blocklist" id="secintel_blocklist">
+		  <option value="blocklist_off">Disabled</otpion>
+		  <option value="blocklist_on_block">Enabled Block</option>
+		  <option value="blocklist_on_log">Enabled Log Only</option>
+		</select>
+		<span class="help-tip">
+		  <p>3rd party feed from www.BlockList.de. Need to be enabled from Sky ATP Cloud UI.</p>
+	        </span>
+	    </div>
+	    <div>
+	    <label>3rd Party - Dshield (IP)</label>
+		<select class="form1-input" name="secintel_dshield" id="secintel_dshield">
+		  <option value="dshield_off">Disabled</otpion>
+		  <option value="dshield_on_block">Enabled Block</option>
+		  <option value="dshield_on_log">Enabled Log Only</option>
+		</select>
+		<span class="help-tip">
+		  <p>3rd party feed from www.dshield.org. Need to be enabled from Sky ATP Cloud UI.</p>
+	        </span>
+	    </div>
+	    <div>
+	    <label>3rd Party - Malware Domain (IP)</label>
+		<select class="form1-input" name="secintel_maldom" id="secintel_maldom">
+		  <option value="maldom_off">Disabled</otpion>
+		  <option value="maldom_on_block">Enabled Block</option>
+		  <option value="maldom_on_log">Enabled Log Only</option>
+		</select>
+		<span class="help-tip">
+		  <p>3rd party feed from http://www.malwaredomainlist.com. Need to be enabled from Sky ATP Cloud UI.</p>
+	        </span>
+	    </div>
+	    <div>
+	    <label>3rd Party - Ransomware Tracker (IP)</label>
+		<select class="form1-input" name="secintel_ransom" id="secintel_ransom">
+		  <option value="ransom_off">Disabled</otpion>
+		  <option value="ransom_on_default">Enabled Default</option>
+		  <option value="ransom_on_log">Enabled Log Only</option>
+		</select>
+		<span class="help-tip">
+		  <p>3rd party feed from https://ransomwaretracker.abuse.ch/. Need to be enabled from Sky ATP Cloud UI.<</p>
+	        </span>
+	    </div>
+	    <div>
+	    <label>3rd Party - Tor (IP)</label>
+		<select class="form1-input" name="secintel_tor" id="secintel_tor">
+		  <option value="tor_off">Disabled</otpion>
+		  <option value="tor_on_default">Enabled Default</option>
+		  <option value="tor_on_log">Enabled Log Only</option>
+		</select>
+		<span class="help-tip">
+		  <p>3rd party feed Tor exist nodes. Need to be enabled from Sky ATP Cloud UI.<</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>SecIntel - Infected Hosts Feed</label>
+		<select class="form1-input" name="secintel_infhosts" id="secintel_infhosts">
+		  <option value="infhosts_off">Disabled</otpion>
+		  <option value="infhosts_on_block">Enabled - Block</option>
+		  <option value="infhosts_on_log">Enabled - Log</option>
+		</select>
+		<span class="help-tip">
+		  <p>Feed which block automatically an infected endpoint. Threshold need to be configured from Sky ATP Cloud UI.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>Enable block message per feed</label>
+		<input class="form1-input" type=checkbox name="secintel_block_msg" id="secintel_block_msg" checked/>
+		<span class="help-tip">
+		  <p>if turned on, a custom message per feed will be displayed.</p>
+	        </span>
+	    </div>
+	  </fieldset>
+  </section>

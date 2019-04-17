@@ -1,0 +1,4 @@
+Flask==0.10.1
+Jinja2==2.8
+pycurl==7.19.5.1
+web.py

@@ -1,0 +1,167 @@
+{#- Sky ATP and SecIntel. #}
+
+
+{#- zone name per deployment type#}	
+{%- if v.get('dep') == "Routed" %}
+{%- set zone_in = "Trust" %}
+{%- set zone_out = "Untrust" %}
+{%- endif %}
+{%- if v.get('dep') == "Secure" %}		
+{%- set zone_in = "Trust-L1" %}
+{%- set zone_out = "Untrust-L1" %}
+{%- endif %}	
+{%- if v.get('dep') == "Sniffer" %}	
+{%- set zone_in = "Sniffer" %}
+{%- set zone_out = "Sniffer" %}
+{%- endif %}	
+
+{%- if v.get('dep') != "Sniffer" %}	
+{%- set aamw_threshold = v.get('aamw_threshold') %}
+{%- else %}
+{%- set aamw_threshold = 7 %}
+{%- endif %}	
+
+{#- Sky ATP configuration #}
+{%- if v.get('aamw') != "aamw_off" %}
+services advanced-anti-malware policy aamw-default http inspection-profile default_profile;
+services advanced-anti-malware policy aamw-default verdict-threshold {{ aamw_threshold }};
+services advanced-anti-malware policy aamw-default http notification log;
+services advanced-anti-malware policy aamw-default fallback-options action permit;
+services advanced-anti-malware policy aamw-default fallback-options notification log;
+	{%- if v.get('aamw_log_only') == "on" or v.get('dep') == "Sniffer" %}
+	services advanced-anti-malware policy aamw-default http action permit;
+	{%- else %}	
+	services advanced-anti-malware policy aamw-default http action block;
+	{%- endif %}
+
+{#- apply to security policy #}
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then permit application-services advanced-anti-malware-policy aamw-default;
+{%- endif %}	
+
+
+
+{#- Security Intelligence configuration #}
+
+
+{#- CC feed #}
+{%- if v.get('secintel_cc') != "cc_off" %}
+{#- variable to be sure to not create 2 policy rules #}
+{%- set secintel=0 %}
+services security-intelligence profile cc category CC;
+	{#- Juniper CC IP feed #}
+	{%- if v.get('secintel_cc_ip') == "cc_ip_on_default"  and v.get('dep') != "Sniffer" %}
+		services security-intelligence profile cc rule jnpr-feed-cc-ip match feed-name cc_ip_data;
+		{#- block for threat level 7 to 10 #}
+		{%- for x in range(7, 11) %}
+		services security-intelligence profile cc rule jnpr-feed-cc-ip match threat-level {{ x }};
+		{%- endfor %} 		
+		{%- if v.get('secintel_block_msg') == "on" %}	
+		services security-intelligence profile cc rule jnpr-feed-cc-ip then action block close http message "This has been blocked by IT! (Juniper Labs IP Threat Feed)";
+		{%- else %}
+		services security-intelligence profile cc rule jnpr-feed-cc-ip then action block close http message "This has been blocked by IT!";
+		{%- endif %}
+		services security-intelligence profile cc rule jnpr-feed-cc-ip then log;
+	{%- endif %}
+
+	{#- Juniper CC URL feed #}
+	{%- if v.get('secintel_cc_url') == "cc_url_on_default"  and v.get('dep') != "Sniffer" %}
+		services security-intelligence profile cc rule jnpr-feed-cc-url match feed-name cc_url_data;
+		{#- block for threat level 7 to 10 #}
+		{%- for x in range(7, 11) %}
+		services security-intelligence profile cc rule jnpr-feed-cc-url match threat-level {{ x }};
+		{%- endfor %} 			
+		{%- if v.get('secintel_block_msg') == "on" %}	
+		services security-intelligence profile cc rule jnpr-feed-cc-url then action block close http message "This has been blocked by IT! (Juniper Labs URL Threat Feed)";
+		{%- else %}
+		services security-intelligence profile cc rule jnpr-feed-cc-url then action block close http message "This has been blocked by IT!";
+		{%- endif %}
+		services security-intelligence profile cc rule jnpr-feed-cc-url then log;
+	{%- endif %}
+
+	{#- Blocklist.de IP feed - score of 10 for all #}
+	{%- if v.get('secintel_blocklist') == "blocklist_on_block"  and v.get('dep') != "Sniffer" %}
+		services security-intelligence profile cc rule blocklist-feed match feed-name cc_ip_blocklist;
+		services security-intelligence profile cc rule blocklist-feed match threat-level 10;
+		{%- if v.get('secintel_block_msg') == "on" %}	
+		services security-intelligence profile cc rule blocklist-feed then action block close http message "This has been blocked by IT! (Blocklist 3rd party Threat Feed)";
+		{%- else %}
+		services security-intelligence profile cc rule blocklist-feed then action block close http message "This has been blocked by IT!";
+		{%- endif %}
+		services security-intelligence profile cc rule blocklist-feed then log;
+	{%- endif %}
+
+	{#- Dshield IP feed - score of 10 for all #}
+	{%- if v.get('secintel_dshield') == "dshield_on_block"  and v.get('dep') != "Sniffer" %}
+		services security-intelligence profile cc rule dshield-feed match feed-name cc_ip_dshield;
+		services security-intelligence profile cc rule dshield-feed match threat-level 10;
+		{%- if v.get('secintel_block_msg') == "on" %}	
+		services security-intelligence profile cc rule dshield-feed then action block close http message "This has been blocked by IT! (Dshield 3rd party Threat Feed)";
+		{%- else %}
+		services security-intelligence profile cc rule dshield-feed then action block close http message "This has been blocked by IT!";
+		{%- endif %}
+		services security-intelligence profile cc rule dshield-feed then log;
+	{%- endif %}
+
+	{#- Malware Domain IP feed - score of 10 for all #}
+	{%- if v.get('secintel_maldom') == "maldom_on_block"  and v.get('dep') != "Sniffer" %}
+		services security-intelligence profile cc rule maldom-feed match feed-name cc_ip_malwaredomainlist;
+		services security-intelligence profile cc rule maldom-feed match threat-level 10;
+		{%- if v.get('secintel_block_msg') == "on" %}	
+		services security-intelligence profile cc rule maldom-feed then action block close http message "This has been blocked by IT! (Malware Domain List 3rd party Threat Feed)";
+		{%- else %}
+		services security-intelligence profile cc rule maldom-feed then action block close http message "This has been blocked by IT!";
+		{%- endif %}
+		services security-intelligence profile cc rule maldom-feed then log;
+	{%- endif %}
+
+
+	{#- Ransomware Tracker IP feed - score of 10 for all #}
+	{%- if v.get('secintel_ransom') == "ransom_on_default"  and v.get('dep') != "Sniffer" %}
+		services security-intelligence profile cc rule ransom-feed match feed-name cc_ip_ransomwaretracker;
+		services security-intelligence profile cc rule ransom-feed match threat-level 10;
+		{%- if v.get('secintel_block_msg') == "on" %}	
+		services security-intelligence profile cc rule ransom-feed then action block close http message "This has been blocked by IT! (Ransomware Tracker 3rd party Threat Feed)";
+		{%- else %}
+		services security-intelligence profile cc rule ransom-feed then action block close http message "This has been blocked by IT!";
+		{%- endif %}
+		services security-intelligence profile cc rule ransom-feed then log;
+	{%- endif %}
+
+
+	{#- ToR IP feed - score of 10 for all #}
+	{%- if v.get('secintel_tor') == "tor_on_default"  and v.get('dep') != "Sniffer" %}
+		services security-intelligence profile cc rule tor-feed match feed-name cc_ip_tor;
+		services security-intelligence profile cc rule tor-feed match threat-level 10;
+		{%- if v.get('secintel_block_msg') == "on" %}	
+		services security-intelligence profile cc rule tor-feed then action block close http message "This has been blocked by IT! (ToR 3rd party Threat Feed)";
+		{%- else %}
+		services security-intelligence profile cc rule tor-feed then action block close http message "This has been blocked by IT!";
+		{%- endif %}
+		services security-intelligence profile cc rule tor-feed then log;
+	{%- endif %}
+
+{#-Default rule for cc #}
+services security-intelligence profile cc default-rule then action permit;
+services security-intelligence profile cc default-rule then log;
+services security-intelligence policy default-secintel CC cc;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then permit application-services security-intelligence-policy default-secintel;
+{%- set secintel=1 %}
+{%- endif %}
+
+{#- IH feed #}
+{%- if v.get('secintel_infhosts') != "infhosts_off" %}	
+	services security-intelligence profile infected-hosts category Infected-Hosts;
+	{%- if v.get('secintel_infhosts') == "infhosts_on_block" and v.get('dep') != "Sniffer" %}
+	services security-intelligence profile infected-hosts default-rule then action block close http message "You have been infected. Please reach out your local IT representative!";
+	services security-intelligence profile infected-hosts default-rule then log;
+	{%- endif %} 
+	{%- if v.get('secintel_infhosts') == "infhosts_on_log" %}
+	services security-intelligence profile infected-hosts default-rule then action permit;
+	services security-intelligence profile infected-hosts default-rule then log;
+	{%- endif %}
+	services security-intelligence policy default-secintel Infected-Hosts infected-hosts;
+	{#- check if a secintel profile has already been applied #}
+	{%- if secintel != 1 %}	
+	security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then permit application-services security-intelligence-policy default-secintel;
+	{%- endif %}
+{%- endif %}

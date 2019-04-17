@@ -1,0 +1,23 @@
+
+{#- User Visbility #}
+
+{#- zone name per deployment type#}	
+{%- if v.get('dep') == "Routed" %}
+{%- set zone_in = "Trust" %}
+{%- set zone_out = "Untrust" %}
+{%- endif %}
+{%- if v.get('dep') == "Secure" %}		
+{%- set zone_in = "Trust-L1" %}
+{%- set zone_out = "Untrust-L1" %}
+{%- endif %}	
+{%- if v.get('dep') == "Sniffer" %}	
+{%- set zone_in = "Sniffer" %}
+{%- set zone_out = "Sniffer" %}
+{%- endif %}	
+
+{%- if v.get('DCIP') != "" and v.get('DomainName') != "" and v.get('Username') != "" and v.get('Password') != "" %}	
+services user-identification active-directory-access domain {{ v.get('DomainName') }} user {{ v.get('Username') }};
+services user-identification active-directory-access domain {{ v.get('DomainName') }} user password {{ v.get('Password') }};
+services user-identification active-directory-access domain {{v.get('DomainName') }} domain-controller AD address {{ v.get('DCIP') }};
+security zones security-zone {{ zone_in }} source-identity-log;
+{%- endif %}

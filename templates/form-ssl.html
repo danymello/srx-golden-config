@@ -1,0 +1,32 @@
+ <section id=formulaire>
+	  <fieldset>
+	    <legend><b>SSL Configuration</b></legend>
+	    <div>
+		<label>SSL Forward Proxy</label>
+		<select class="form1-input" name="sslfp" id="sslfp">
+		  <option value="sslfp_off">Disabled</option>
+		  <option value="sslfp_on">Enabled</option>
+		</select>
+		<span class="help-tip">
+		  <p>This will enbale SSL decryption for outgoing traffic.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>SSL Proxy Financial URL Category Whitelist</label>
+		<select class="form1-input" name="bypass_sslfp" id="bypass_sslfp">
+		  <option value="ssl_bypass_off">Off</otpion>
+		  <option value="ssl_bypass_on">On</option>
+		</select>
+		<span class="help-tip">
+		  <p>Financial websites will be exempt of decryption. DO NOT enable this if Local Web Filtering is used.</p>
+	        </span>
+	    </div>
+	    <!-- <div>
+		<label>SSL Proxy</label>
+		<select name="sslp" id="sslp">
+		  <option value="sslp_off">Disabled</option>
+		  <option value="sslp_on">Enabled</option>
+		</select>
+	    </div> -->
+	  </feldset>
+  </section>

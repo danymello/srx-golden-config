@@ -1,0 +1,37 @@
+{#- AppSecure #}
+
+{#- zone name per deployment type#}	
+{%- if v.get('dep') == "Routed" %}
+{%- set zone_in = "Trust" %}
+{%- set zone_out = "Untrust" %}
+{%- endif %}
+{%- if v.get('dep') == "Secure" %}		
+{%- set zone_in = "Trust-L1" %}
+{%- set zone_out = "Untrust-L1" %}
+{%- endif %}	
+{%- if v.get('dep') == "Sniffer" %}	
+{%- set zone_in = "Sniffer" %}
+{%- set zone_out = "Sniffer" %}
+{%- endif %}
+
+{#- AppTrack #}	
+{%- if v.get('apptrack') == "apptrack_on" %}	
+security zones security-zone {{ zone_in }} application-tracking;
+{%- endif %}
+
+{#- AppSecure - 18.2+ #}	
+{%- if v.get('appfw') == "appfw_demo" and v.get('sslfp') == "sslfp_off" %}	
+security dynamic-application profile custom-block redirect-message type custom-text content "No Way!";
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match source-address any;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match destination-address any;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match application junos-defaults;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match dynamic-application junos:web:proxy;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match dynamic-application junos:web:gaming;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match dynamic-application junos:gaming:protocols;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match dynamic-application junos:gaming;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match dynamic-application junos:web:anonymizer;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match dynamic-application junos:web:multimedia:video-streaming;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match dynamic-application junos:p2p;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App match dynamic-application junos:remote-access:tunneling;
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy Blacklist-App then reject profile custom-block;
+{%- endif %}

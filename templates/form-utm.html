@@ -1,0 +1,35 @@
+<section id=formulaire>
+  	<fieldset>
+	    <legend><b>UTM Configuration</b></legend>
+	    <div>
+		<label>Web Filtering</label>
+		<select class="form1-input" name="ewf" id="ewf">
+		  <option value = "EWF_OFF">Disabled</option>
+		  <option value = "EWF_LO">Enabled - Log Only</option>
+		  <option value = "EWF_DEFAULT">Enabled - Default profile</option>
+		  <option value = "EWF_DEMO_ALL">Enabled - Demo all EWF features</option>
+		</select>
+		<span class="help-tip">
+		  <p>"Demo all":<br><b>BLOCK</b>: Enhanced_Adult_Material action, Enhanced_Adult_Content action, Enhanced_Malicious_Web_Sites action, Enhanced_Proxy_Avoidance action, Enhanced_News_and_Media.<br><b>QUARANTINE</b>: Enhanced_Gambling.<br><b>BLOCK</b> all suspicious and harmful based on site reputation.<br>
+<b>LOG all</b></p>
+	        </span>
+	    </div>
+	    <div>
+		<label>Anti-Virus</label>
+		<select class="form1-input" name="avv" id="avv">
+		  <option value = "AVV_OFF">Disabled</option>
+		  <option value = "AVV_SOPHOS">Sophos AV</option>
+		</select>
+		<span class="help-tip">
+		  <p>Enable Sophos AV (Cloud based) and teh default SAV junos profile.</p>
+	        </span>
+	    </div>
+	    <div>
+		<label>Anti-Spam</label>
+		<select class="form1-input" name="as" id="as">
+		  <option value = "AS_OFF">Disabled</option>
+		  <option value = "AS_ON">Enabled</option>
+		</select>
+	    </div>
+	</fieldset>
+  </section> 

@@ -1,0 +1,68 @@
+{#- 
+	UTM
+#}
+
+{#- zone name per deployment type#}	
+{%- if v.get('dep') == "Routed" %}
+{%- set zone_in = "Trust" %}
+{%- set zone_out = "Untrust" %}
+{%- endif %}
+{%- if v.get('dep') == "Secure" %}		
+{%- set zone_in = "Trust-L1" %}
+{%- set zone_out = "Untrust-L1" %}
+{%- endif %}	
+{%- if v.get('dep') == "Sniffer" %}	
+{%- set zone_in = "Sniffer" %}
+{%- set zone_out = "Sniffer" %}
+{%- endif %}
+
+{#- Web Filtering log only #}	
+{%- if v.get('ewf') == "EWF_LO" %}	
+security utm feature-profile web-filtering type juniper-enhanced;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF-LOG default log-and-permit;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF-LOG fallback-settings default log-and-permit;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF-LOG timeout 30;
+security utm utm-policy UTM-Policy web-filtering http-profile UTM-EWF-LOG;
+{%- endif %}
+
+{#- Web Filtering default #}	
+{%- if v.get('ewf') == "EWF_DEFAULT" %}	
+security utm feature-profile web-filtering type juniper-enhanced;
+security utm utm-policy UTM-Policy web-filtering http-profile junos-wf-enhanced-default;
+{%- endif %}
+
+{#- Web Filtering Demo #}	
+{%- if v.get('ewf') == "EWF_DEMO_ALL" %}	
+security utm feature-profile web-filtering type juniper-enhanced;
+security utm custom-objects url-pattern BAD value http://*.cisco.com;
+security utm custom-objects custom-url-category BLACKLISTED value BAD;
+security utm feature-profile web-filtering url-blacklist BLACKLISTED;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF category Enhanced_Adult_Material action block;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF category Enhanced_Adult_Content action block;")
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF category Enhanced_Malicious_Web_Sites action block;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF category Enhanced_Proxy_Avoidance action block;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF category Enhanced_News_and_Media action block;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF default log-and-permit;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF fallback-settings default log-and-permit;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF timeout 30;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF category Enhanced_Gambling action quarantine;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF site-reputation-action suspicious block;
+security utm feature-profile web-filtering juniper-enhanced profile UTM-EWF site-reputation-action harmful block;
+security utm utm-policy UTM-Policy web-filtering http-profile UTM-EWF;	
+{%- endif %}
+
+{#- SOPHOS AV #}	
+{%- if v.get('avv') == "AVV_SOPHOS"  %}	
+security utm feature-profile anti-virus type sophos-engine;
+security utm utm-policy UTM-Policy anti-virus http-profile junos-sophos-av-defaults;
+{%- endif %}
+
+{#- SOPHOS AS #}	
+{%- if v.get('aspam') == "AS_ON"  %}
+security utm utm-policy UTM-Policy anti-spam smtp-profile junos-as-defaults;
+{%- endif %}	
+
+{#- Apply to security policy #}	
+{%- if v.get('aspam') != "AS_OFF" or v.get('avv') != "AVV_OFF" or v.get('ewf') != "EWF_OFF" %}
+security policies from-zone {{ zone_in }} to-zone {{ zone_out }} policy outbound then permit application-services utm-policy UTM-Policy;
+{%- endif %}
